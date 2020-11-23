@@ -89,6 +89,15 @@ export default {
     },
   },
   methods: {
+    saveOwnedToLocal: function() {
+      const ownedNameList = this.cardStatusList.filter((cs) => {
+        return cs.owned
+      }).map((card) =>{
+        return card.name
+      })
+      const parsed = JSON.stringify(ownedNameList);
+      localStorage.setItem("ownedCards", parsed);
+    },
     changeToOwned: function (card) {
       this.cardStatusList = this.cardStatusList.map(cs => {
         if(cs.name == card.name){
@@ -96,6 +105,7 @@ export default {
         }
         return cs
       })
+      this.saveOwnedToLocal()
     },
     changeToNotOwned: function (card) {
       this.cardStatusList = this.cardStatusList.map(cs => {
@@ -104,6 +114,7 @@ export default {
         }
         return cs
       })
+      this.saveOwnedToLocal()
     },
   },
   data() {
