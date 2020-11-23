@@ -8,12 +8,20 @@
       <v-data-table
         v-model="selected"
         :headers="headers"
-        :items="cards"
+        :items="owned"
         item-key="name"
         show-select
         class="elevation-1"
       >
         <template v-slot:header.data-table-select> </template>
+      </v-data-table>
+      <v-data-table
+        v-model="selected"
+        :headers="headers"
+        :items="notOwned"
+        item-key="name"
+        class="elevation-1"
+      >
       </v-data-table>
     </v-col>
   </v-row>
@@ -46,6 +54,14 @@ export default {
       const parsed = JSON.stringify(selectedCards);
       localStorage.setItem("selectedCards", parsed);
     },
+  },
+  computed: {
+    owned: function(){
+      return this.cards
+    },
+    notOwned: function(){
+      return []
+    }
   },
   data() {
     return {
