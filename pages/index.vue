@@ -1,10 +1,6 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="6">
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
       <v-data-table
         v-model="selected"
         :headers="headers"
@@ -34,14 +30,7 @@
 </template>
 
 <script>
-import Logo from "~/components/Logo.vue";
-import VuetifyLogo from "~/components/VuetifyLogo.vue";
-
 export default {
-  components: {
-    Logo,
-    VuetifyLogo,
-  },
   mounted() {
     let ownedCards = [];
     if (localStorage.getItem("ownedCards")) {
