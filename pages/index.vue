@@ -8,20 +8,26 @@
       <v-data-table
         v-model="selected"
         :headers="headers"
-        :items="owned"
+        :items="ownedCards"
         item-key="name"
         show-select
         class="elevation-1"
       >
         <template v-slot:header.data-table-select> </template>
+        <template v-slot:item.action="{ item }">
+          <v-btn @click="changeToNotOwned(item)">未所持へ</v-btn>
+        </template>
       </v-data-table>
       <v-data-table
         v-model="selected"
         :headers="headers"
-        :items="notOwned"
+        :items="notOwnedCards"
         item-key="name"
         class="elevation-1"
       >
+        <template v-slot:item.action="{ item }">
+          <v-btn @click="changeToOwned(item)">所持へ</v-btn>
+        </template>
       </v-data-table>
     </v-col>
   </v-row>
@@ -37,16 +43,31 @@ export default {
     VuetifyLogo,
   },
   mounted() {
-    if (!localStorage.getItem("selectedCards")) {
-      return;
+    let ownedCards = [];
+    if (localStorage.getItem("ownedCards")) {
+      try {
+        ownedCards = JSON.parse(localStorage.getItem("ownedCards"));
+      } catch (e) {}
     }
+    this.cardStatusList = this.cards.map((card) => {
+      if (ownedCards.includes(card.name)) {
+        card.owned = true;
+      } else {
+        card.owned = false;
+      }
 
-    try {
-      const selectedCards = JSON.parse(localStorage.getItem("selectedCards"));
-      this.selected = this.cards.filter((card) => {
-        return selectedCards.includes(card.name);
-      });
-    } catch (e) {}
+      return card;
+    });
+
+    let selectedCards = [];
+    if (localStorage.getItem("selectedCards")) {
+      try {
+        selectedCards = JSON.parse(localStorage.getItem("selectedCards"));
+      } catch (e) {}
+    }
+    this.selected = this.cards.filter((card) => {
+      return selectedCards.includes(card.name);
+    });
   },
   watch: {
     selected: function (newSelected, oldSelected) {
@@ -56,17 +77,41 @@ export default {
     },
   },
   computed: {
-    owned: function(){
-      return this.cards
+    ownedCards: function () {
+      return this.cardStatusList.filter((card) => {
+        return card.owned;
+      })
     },
-    notOwned: function(){
-      return []
-    }
+    notOwnedCards: function () {
+      return this.cardStatusList.filter((card) => {
+        return !card.owned;
+      })
+    },
+  },
+  methods: {
+    changeToOwned: function (card) {
+      this.cardStatusList = this.cardStatusList.map(cs => {
+        if(cs.name == card.name){
+          cs.owned = true
+        }
+        return cs
+      })
+    },
+    changeToNotOwned: function (card) {
+      this.cardStatusList = this.cardStatusList.map(cs => {
+        if(cs.name == card.name){
+          cs.owned = false
+        }
+        return cs
+      })
+    },
   },
   data() {
     return {
       singleSelect: false,
       selected: [],
+      owned: [],
+      cardStatusList: [],
       headers: [
         {
           text: "レアリティ",
@@ -76,6 +121,7 @@ export default {
         { text: "カード名", value: "name" },
         { text: "アイドル", value: "idol" },
         { text: "ユニット", value: "unit" },
+        { text: "", value: "action" },
       ],
       cards: [
         {
